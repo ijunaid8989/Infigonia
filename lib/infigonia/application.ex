@@ -8,6 +8,7 @@ defmodule Infigonia.Application do
   @impl true
   def start(_type, _args) do
     children = [
+      Infigonia.Repo
       # Starts a worker by calling: Infigonia.Worker.start_link(arg)
       # {Infigonia.Worker, arg}
     ]
