@@ -5,7 +5,10 @@ defmodule Infigonia.UsdConversionRates.Poller do
 
   require Logger
 
-  def start_link(_args) do
+  # a day
+  @runner 86400
+
+  def start_link(_opt) do
     GenServer.start_link(__MODULE__, %{}, name: __MODULE__)
   end
 
@@ -22,7 +25,7 @@ defmodule Infigonia.UsdConversionRates.Poller do
 
     Logger.info("Fetching the rates and setting the clock")
 
-    clock = Process.send_after(self(), :fetch_rates, 10_000)
+    clock = Process.send_after(self(), :fetch_rates, @runner)
 
     {:noreply, Map.put(state, :clock, clock)}
   end
@@ -33,7 +36,7 @@ defmodule Infigonia.UsdConversionRates.Poller do
 
     Logger.info("Fetching the rates and setting the clock from ticker")
 
-    clock = Process.send_after(self(), :fetch_rates, 10_000)
+    clock = Process.send_after(self(), :fetch_rates, @runner)
 
     {:noreply, Map.put(state, :clock, clock)}
   end

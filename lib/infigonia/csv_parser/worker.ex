@@ -12,9 +12,9 @@ defmodule Infigonia.CSVParser.Worker do
   # 3 hours
   @runner 10800
 
-  @spec start_link(map()) :: :ignore | {:error, any} | {:ok, pid}
-  def start_link(state) do
-    GenServer.start_link(__MODULE__, state, name: __MODULE__)
+  @spec start_link(any()) :: :ignore | {:error, any} | {:ok, pid}
+  def start_link(_opt) do
+    GenServer.start_link(__MODULE__, %{}, name: __MODULE__)
   end
 
   @spec init(map()) :: {:ok, any, {:continue, :sync_db}}

@@ -8,7 +8,9 @@ defmodule Infigonia.Application do
   @impl true
   def start(_type, _args) do
     children = [
-      Infigonia.Repo
+      Infigonia.Repo,
+      {DynamicSupervisor, strategy: :one_for_one, name: Infigonia.DynamicSupervisor},
+      {Task, &Infigonia.DynamicSupervisor.start_children/0}
       # Starts a worker by calling: Infigonia.Worker.start_link(arg)
       # {Infigonia.Worker, arg}
     ]
