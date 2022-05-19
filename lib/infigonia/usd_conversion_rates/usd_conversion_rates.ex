@@ -3,17 +3,23 @@ defmodule Infigonia.UsdConversionRates do
 
   alias Infigonia.Repo
 
-  import Ecto.Changeset
+  import Ecto.{Changeset, Query}
 
   schema "usd_conversion_rates" do
     field(:datetime, :utc_datetime)
-    embeds_many(:rates, Infigonia.CurrencyRates)
+    embeds_one(:rates, Infigonia.CurrencyRates)
   end
 
   def insert(rates_and_time) do
     %Infigonia.UsdConversionRates{}
     |> changeset(rates_and_time)
     |> Repo.insert(on_conflict: :nothing)
+  end
+
+  def latest_usd_rates() do
+    Infigonia.UsdConversionRates
+    |> last(:datetime)
+    |> Repo.one()
   end
 
   @spec changeset(

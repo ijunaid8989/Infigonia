@@ -24,6 +24,6 @@ defmodule Infigonia.API.Exchangerates do
   defp prepare_for_db(data) do
     datetime = DateTime.from_unix!(data.timestamp)
 
-    %{datetime: datetime, rates: [data.rates]}
+    %{datetime: datetime, rates: data.rates}
   end
 end

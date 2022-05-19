@@ -22,9 +22,9 @@ defmodule Infigonia.CSVDownloader.Worker do
     {:ok, state, {:continue, :download_csv}}
   end
 
-  def handle_continue(:download_csv, state) do
-    %{sources: sources} = state
-
+  @spec handle_continue(:download_csv, %{:sources => list(String.t()), :clock => reference}) ::
+          {:noreply, %{:clock => reference, :sources => any}}
+  def handle_continue(:download_csv, %{sources: sources} = state) do
     stream_csvs(sources)
     Logger.info("Fetching the CSV from source.")
 
@@ -33,10 +33,8 @@ defmodule Infigonia.CSVDownloader.Worker do
     {:noreply, Map.put(state, :clock, clock)}
   end
 
-  def handle_info(:download_csv, state) do
-    %{sources: sources} = state
+  def handle_info(:download_csv, %{sources: sources} = state) do
     stream_csvs(sources)
-    Logger.info("Fetching the CSV from source.")
 
     Logger.info("Fetching the CSV from source and setting the clock from ticker")
 
