@@ -25,7 +25,8 @@ defmodule Infigonia.MixProject do
       {:ecto_sql, "~> 3.0"},
       {:postgrex, ">= 0.0.0"},
       {:httpoison, "~> 1.8"},
-      {:jason, "~> 1.3"}
+      {:jason, "~> 1.3"},
+      {:nimble_csv, "~> 1.1"}
     ]
   end
 end

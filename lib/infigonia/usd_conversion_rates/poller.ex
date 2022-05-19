@@ -17,7 +17,6 @@ defmodule Infigonia.UsdConversionRates.Poller do
   @spec handle_continue(:fetch_rates, map) ::
           {:noreply, %{:clock => reference, optional(any) => any}}
   def handle_continue(:fetch_rates, state) do
-
     Exchangerates.latest()
     |> UsdConversionRates.insert()
 
