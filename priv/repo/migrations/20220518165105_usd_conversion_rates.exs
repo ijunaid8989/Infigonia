@@ -7,7 +7,7 @@ defmodule Infigonia.Repo.Migrations.UsdConversionRates do
       add :rates, {:array, :map}, default: []
     end
 
-    create index("usd_conversion_rates", [:datetime])
-    create unique_index("usd_conversion_rates", [:datetime, :rates])
+    # create index("usd_conversion_rates", ["(datetime::date)"])
+    create unique_index("usd_conversion_rates", ["(datetime::date)"])
   end
 end

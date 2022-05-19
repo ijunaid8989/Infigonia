@@ -1,6 +1,8 @@
 defmodule Infigonia.UsdConversionRates.Poller do
   use GenServer
 
+  alias Infigonia.{API.Exchangerates, UsdConversionRates}
+
   require Logger
 
   def start_link(_args) do
@@ -15,6 +17,10 @@ defmodule Infigonia.UsdConversionRates.Poller do
   @spec handle_continue(:fetch_rates, map) ::
           {:noreply, %{:clock => reference, optional(any) => any}}
   def handle_continue(:fetch_rates, state) do
+
+    Exchangerates.latest()
+    |> UsdConversionRates.insert()
+
     Logger.info("Fetching the rates and setting the clock")
 
     clock = Process.send_after(self(), :fetch_rates, 10_000)
@@ -23,6 +29,9 @@ defmodule Infigonia.UsdConversionRates.Poller do
   end
 
   def handle_info(:fetch_rates, state) do
+    Exchangerates.latest()
+    |> UsdConversionRates.insert()
+
     Logger.info("Fetching the rates and setting the clock from ticker")
 
     clock = Process.send_after(self(), :fetch_rates, 10_000)
