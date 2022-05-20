@@ -1,4 +1,11 @@
 defmodule Infigonia.UsdConversionRates.Poller do
+  @moduledoc """
+  Module: Poller
+  This is responsible for fetching latest currency rates with respect to USD, as base currency, we are using, Exchangerate API. The worker
+  will run after each day, and fetch records, on DataBase Level have added a unique index over datetime so, even if the rates where fetched already
+  for a day, and application got crashed or restarted, it won't duplicate, we are doing nothing on unique index conflict.
+  """
+
   use GenServer
 
   alias Infigonia.{API.Exchangerates, UsdConversionRates}
@@ -8,6 +15,7 @@ defmodule Infigonia.UsdConversionRates.Poller do
   # a day
   @runner 86400
 
+  @spec start_link(any) :: :ignore | {:error, any} | {:ok, pid}
   def start_link(_opt) do
     GenServer.start_link(__MODULE__, %{}, name: __MODULE__)
   end

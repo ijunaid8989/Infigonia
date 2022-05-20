@@ -1,4 +1,14 @@
 defmodule Infigonia.CSVParser.Worker do
+  @moduledoc """
+  Module: CSVParser.Worker
+  The purpose of this module is to look in the directory `csvs/downloaded/`, every 3 hours, and parse that CSV contents and create revenue report
+  for each currency, while fetching the latest currency rates and then insert that to database.
+
+  while completion of one CSV its also deleting the CSV as well.
+
+  As first 3 columns are common in every source CSV, we are keeping them in the Database as columns but then all others are going in as map, so they can
+  be any and annonymous as well, its being saved as others.
+  """
   use GenServer
 
   require Logger

@@ -1,4 +1,23 @@
 defmodule Infigonia.CSVDownloader.Worker do
+  @moduledoc """
+  Module: CSVDownloader.Worker
+  The purpose of the module is to download CSV files from the sources and save them to downloaded folder.
+
+  the source at initial stage is a list, so this worker would start with a map i.e %{sources: ["source_url"]}.
+
+  You can also update the sources,
+
+  ## Example
+  iex> Infigonia.CSVDownloader.Worker.start_link(%{sources: ["https://testsoruce.com/test.csv"]})
+  {:ok, pid}
+
+  Infigonia.CSVDownloader.Worker.add_a_new_source("https://new_source_url.com/test.csv")
+
+  :ok
+
+  every 6 hours, it would fetch CSVs from the source and save them.
+  iex>
+  """
   use GenServer
 
   require Logger

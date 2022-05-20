@@ -1,4 +1,9 @@
 defmodule Infigonia.API.Exchangerates do
+  @moduledoc """
+  Module: Exchangerates
+  The module is an API wrapper around the exchange rates api, where we are getting the latest currency rates with respect to USD to be the
+  base currency.
+  """
   @spec latest :: %{:datetime => DateTime.t(), :rates => [map()]} | []
   def latest() do
     headers = [apikey: exchangerates_api_key(), Accept: "Application/json; Charset=utf-8"]

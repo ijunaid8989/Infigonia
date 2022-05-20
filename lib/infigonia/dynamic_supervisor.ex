@@ -1,4 +1,12 @@
 defmodule Infigonia.DynamicSupervisor do
+  @moduledoc """
+  DynamicSupervisor:
+
+  We are using DynamicSupervisor for starting each our Worker as a child, with one for one strategy.
+
+  So each worker can run independently from each other and, if one would crashed, others will continue work and the crashed one
+  will start it self again.
+  """
   use DynamicSupervisor
 
   @spec start_link(any) :: :ignore | {:error, any} | {:ok, pid}
@@ -23,7 +31,7 @@ defmodule Infigonia.DynamicSupervisor do
   @spec start_children :: :ok
   def start_children do
     start_child(Infigonia.UsdConversionRates.Poller, %{})
-    start_child(Infigonia.CSVDownloader.Worker, %{sources: []})
+    start_child(Infigonia.CSVDownloader.Worker, %{sources: []}) #source would a string urls, something like https://localhost:4000/itsacsv.csv
     start_child(Infigonia.CSVParser.Worker, %{})
 
     :ok
