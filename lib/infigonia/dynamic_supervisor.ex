@@ -31,7 +31,8 @@ defmodule Infigonia.DynamicSupervisor do
   @spec start_children :: :ok
   def start_children do
     start_child(Infigonia.UsdConversionRates.Poller, %{})
-    start_child(Infigonia.CSVDownloader.Worker, %{sources: []}) #source would a string urls, something like https://localhost:4000/itsacsv.csv
+    # source would a string urls, something like https://localhost:4000/itsacsv.csv
+    start_child(Infigonia.CSVDownloader.Worker, %{sources: []})
     start_child(Infigonia.CSVParser.Worker, %{})
 
     :ok

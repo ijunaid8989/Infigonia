@@ -9,7 +9,7 @@ defmodule Infigonia.Application do
   def start(_type, _args) do
     children = [
       Infigonia.Repo,
-      #Here we are first starting our Supervisor and then the other workers as childs, this solution was suggested by Jose here
+      # Here we are first starting our Supervisor and then the other workers as childs, this solution was suggested by Jose here
       # https://elixirforum.com/t/understanding-dynamicsupervisor-no-initial-children/14938?u=slashdotdash
       {DynamicSupervisor, strategy: :one_for_one, name: Infigonia.DynamicSupervisor},
       {Task, &Infigonia.DynamicSupervisor.start_children/0}
