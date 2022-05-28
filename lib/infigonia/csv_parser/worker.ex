@@ -20,7 +20,7 @@ defmodule Infigonia.CSVParser.Worker do
   @path "csvs/downloaded/"
 
   # 3 hours
-  @runner 10800
+  @runner 10_800_000
 
   @spec start_link(any()) :: :ignore | {:error, any} | {:ok, pid}
   def start_link(_opt) do

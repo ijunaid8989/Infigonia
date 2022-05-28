@@ -7,3 +7,5 @@ config :infigonia, Infigonia.Repo,
   database: "infigonia_test#{System.get_env("MIX_TEST_PARTITION")}",
   pool: Ecto.Adapters.SQL.Sandbox,
   pool_size: 10
+
+config :infigonia, Oban, testing: :inline
