@@ -12,7 +12,8 @@ defmodule Infigonia.Application do
       # Here we are first starting our Supervisor and then the other workers as childs, this solution was suggested by Jose here
       # https://elixirforum.com/t/understanding-dynamicsupervisor-no-initial-children/14938?u=slashdotdash
       {DynamicSupervisor, strategy: :one_for_one, name: Infigonia.DynamicSupervisor},
-      {Task, &Infigonia.DynamicSupervisor.start_children/0}
+      {Task, &Infigonia.DynamicSupervisor.start_children/0},
+      {Oban, Application.fetch_env!(:infigonia, Oban)}
       # Starts a worker by calling: Infigonia.Worker.start_link(arg)
       # {Infigonia.Worker, arg}
     ]
