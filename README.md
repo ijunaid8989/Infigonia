@@ -26,3 +26,10 @@
     * Libcluster has multiple strategies, for making connection with nodes as well as written hosts and discovery as well.
   - Sources table has been added and removed from State of GenServer as we have removed GenServer now, totally and DynamicSupervisor has gone as well.
   - `Infigonia.Sources.Source.insert/1` has been added to update the source, the worker will get sources after 6 hours and start adding jobs, and it will be spreaded out to multiple nodes as well. See Application.ex file for details and Oban linked hex docs.
+
+
+## NOTE
+   - I still believe whole above process can also be done without Oban, and without libcluster those applications are made for making things easy.
+   - My first plan was not use a Single GenServer as global with every state, so when a source will be added it will be available to every node. but still when that GenServer will be lost, state will lost and each module will be empty to perform anything.
+
+Thank you.
