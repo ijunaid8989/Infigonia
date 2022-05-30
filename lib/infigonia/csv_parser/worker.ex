@@ -1,15 +1,9 @@
 defmodule Infigonia.CSVParser.Worker do
+  use Oban.Worker, unique: [fields: [:args, :worker], keys: [:path]]
+
   @moduledoc """
   Module: CSVParser.Worker
-  The purpose of this module is to look in the directory `csvs/downloaded/`, every 3 hours, and parse that CSV contents and create revenue report
-  for each currency, while fetching the latest currency rates and then insert that to database.
-
-  while completion of one CSV its also deleting the CSV as well.
-
-  As first 3 columns are common in every source CSV, we are keeping them in the Database as columns but then all others are going in as map, so they can
-  be any and annonymous as well, its being saved as others.
   """
-  use GenServer
 
   require Logger
 
@@ -17,46 +11,24 @@ defmodule Infigonia.CSVParser.Worker do
 
   alias Infigonia.{UsdConversionRates, Revenues}
 
-  @path "csvs/downloaded/"
-
-  # 3 hours
-  @runner 10_800_000
-
-  @spec start_link(any()) :: :ignore | {:error, any} | {:ok, pid}
-  def start_link(_opt) do
-    GenServer.start_link(__MODULE__, %{}, name: __MODULE__)
+  @impl Oban.Worker
+  @spec perform(any) :: :ok
+  def perform(%Oban.Job{args: %{"path" => path}} = _args) do
+    parse_and_save(path)
+    :ok
   end
 
-  @spec init(map()) :: {:ok, any, {:continue, :sync_db}}
-  def init(state) do
-    {:ok, state, {:continue, :sync_db}}
-  end
+  defp parse_and_save(path) do
+    parse_csv(path)
+    |> prepare_for_db()
+    |> Revenues.insert()
 
-  @spec handle_continue(:sync_db, map) :: {:noreply, %{:clock => reference}}
-  def handle_continue(:sync_db, state) do
-    Path.wildcard(@path <> "*.csv")
-    |> db_streams()
-
-    Logger.info("Parsing the CSV from source.")
-
-    clock = Process.send_after(self(), :sync_db, @runner)
-
-    {:noreply, Map.put(state, :clock, clock)}
-  end
-
-  def handle_info(:sync_db, state) do
-    Path.wildcard(@path <> "*.csv")
-    |> db_streams()
-
-    Logger.info("Parsing the CSV from source and setting the clock from ticker")
-
-    clock = Process.send_after(self(), :sync_db, @runner)
-
-    {:noreply, Map.put(state, :clock, clock)}
+    File.rm(path)
+    :ok
   end
 
   @spec parse_csv(String.t()) :: list(map())
-  def parse_csv(path) do
+  defp parse_csv(path) do
     path
     |> File.stream!([:trim_bom])
     |> CSV.parse_stream(skip_headers: false)
@@ -77,7 +49,7 @@ defmodule Infigonia.CSVParser.Worker do
   end
 
   @spec prepare_for_db(list(map())) :: list(map())
-  def prepare_for_db(data_from_csv) do
+  defp prepare_for_db(data_from_csv) do
     rates = UsdConversionRates.latest_usd_rates().rates
 
     data_from_csv
@@ -101,21 +73,5 @@ defmodule Infigonia.CSVParser.Worker do
       {:ok, rate} -> rate
       _error -> 0
     end
-  end
-
-  defp db_streams(file_paths) do
-    db_transaction = fn path ->
-      parse_csv(path)
-      |> prepare_for_db()
-      |> Revenues.insert()
-
-      File.rm(path)
-    end
-
-    file_paths
-    |> Task.async_stream(db_transaction, max_concurrency: 10, timeout: :infinity)
-    |> Stream.run()
-
-    :ok
   end
 end

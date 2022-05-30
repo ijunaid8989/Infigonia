@@ -13,9 +13,11 @@ config :infigonia, Oban,
     Oban.Plugins.Pruner,
     {Oban.Plugins.Cron,
      crontab: [
-       {"@daily", Infigonia.UsdConversionRates.Poller}
+       {"@daily", Infigonia.UsdConversionRates.Poller},
+       {"0 */6 * * *", Infigonia.CSVDownloader.Downloader},
+       {"0 */3 * * *", Infigonia.CSVParser.Parser}
      ]}
   ],
-  queues: [default: 10, periodic: 3]
+  queues: [default: 10, periodic: 10, hardworker: 30]
 
 import_config "#{config_env()}.exs"
