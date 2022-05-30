@@ -9,6 +9,11 @@ defmodule Infigonia.Application do
   def start(_type, _args) do
     children = [
       Infigonia.Repo,
+      {Cluster.Supervisor,
+       [
+         Application.get_env(:libcluster, :topologies),
+         [name: Infigonia.ClusterSupervisor]
+       ]},
       {Oban, oban_opts()}
     ]
 

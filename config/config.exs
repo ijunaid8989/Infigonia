@@ -20,4 +20,11 @@ config :infigonia, Oban,
   ],
   queues: [default: 10, periodic: 10, hardworker: 30]
 
+config :libcluster,
+  topologies: [
+    infigonia: [
+      strategy: Cluster.Strategy.Gossip
+    ]
+  ]
+
 import_config "#{config_env()}.exs"

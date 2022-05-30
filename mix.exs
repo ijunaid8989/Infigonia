@@ -27,7 +27,8 @@ defmodule Infigonia.MixProject do
       {:httpoison, "~> 1.8"},
       {:jason, "~> 1.3"},
       {:nimble_csv, "~> 1.1"},
-      {:oban, "~> 2.12"}
+      {:oban, "~> 2.12"},
+      {:libcluster, "~> 3.3"}
     ]
   end
 end
