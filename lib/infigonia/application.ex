@@ -9,18 +9,39 @@ defmodule Infigonia.Application do
   def start(_type, _args) do
     children = [
       Infigonia.Repo,
-      # Here we are first starting our Supervisor and then the other workers as childs, this solution was suggested by Jose here
-      # https://elixirforum.com/t/understanding-dynamicsupervisor-no-initial-children/14938?u=slashdotdash
-      {DynamicSupervisor, strategy: :one_for_one, name: Infigonia.DynamicSupervisor},
-      {Task, &Infigonia.DynamicSupervisor.start_children/0},
-      {Oban, Application.fetch_env!(:infigonia, Oban)}
-      # Starts a worker by calling: Infigonia.Worker.start_link(arg)
-      # {Infigonia.Worker, arg}
+      {Cluster.Supervisor,
+       [
+         Application.get_env(:libcluster, :topologies),
+         [name: Infigonia.ClusterSupervisor]
+       ]},
+      {Oban, oban_opts()}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: Infigonia.Supervisor]
     Supervisor.start_link(children, opts)
+  end
+
+  # Please see the documentation for Oban, to spread queues on nodes. https://hexdocs.pm/oban/splitting-queues.html
+  defp oban_opts do
+    env_queues = System.get_env("OBAN_QUEUES")
+
+    :infigonia
+    |> Application.get_env(Oban)
+    |> Keyword.update(:queues, [], &queues(env_queues, &1))
+  end
+
+  defp queues("*", defaults), do: defaults
+  defp queues(nil, defaults), do: defaults
+  defp queues(_, false), do: false
+
+  defp queues(values, _defaults) when is_binary(values) do
+    values
+    |> String.split(" ", trim: true)
+    |> Enum.map(&String.split(&1, ",", trim: true))
+    |> Keyword.new(fn [queue, limit] ->
+      {String.to_existing_atom(queue), String.to_integer(limit)}
+    end)
   end
 end
