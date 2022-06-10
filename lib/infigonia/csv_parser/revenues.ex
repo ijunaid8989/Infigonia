@@ -11,7 +11,10 @@ defmodule Infigonia.Revenues do
     field(:date, :date)
     field(:currency, :string)
     field(:revenue, :decimal)
-    field(:others, :map)
+    field(:random1, :string)
+    field(:random2, :string)
+    field(:random3, :string)
+    field(:random4, :string)
   end
 
   def insert(revenues) do
@@ -39,7 +42,7 @@ defmodule Infigonia.Revenues do
         ) :: Ecto.Changeset.t()
   def changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:date, :currency, :revenue, :others])
+    |> cast(params, [:date, :currency, :revenue, :random1, :random2, :random3, :random4])
     |> validate_required([:date, :currency, :revenue])
   end
 end

@@ -37,13 +37,11 @@ defmodule Infigonia.CSVParser.Worker do
         {[], r}
 
       r, acc ->
-        {result, others} =
-          acc
-          |> Enum.zip(r)
-          |> Map.new()
-          |> Map.split(~w|revenue currency date|)
-
-        {[Map.put(result, "others", others)], acc}
+        {[
+           acc
+           |> Enum.zip(r)
+           |> Map.new()
+         ], acc}
     end)
     |> Enum.to_list()
   end
@@ -56,15 +54,13 @@ defmodule Infigonia.CSVParser.Worker do
     |> Enum.map(fn data ->
       currency = String.to_atom(data["currency"])
       revenue = String.to_float(data["revenue"])
+      date = Date.from_iso8601!(data["date"])
 
       rate = get_rate(rates, currency)
 
-      %{
-        currency: data["currency"],
-        date: Date.from_iso8601!(data["date"]),
-        others: data["others"],
-        revenue: revenue * rate
-      }
+      atomize_map_keys(data)
+      |> Map.put(:date, date)
+      |> Map.put(:revenue, revenue * rate)
     end)
   end
 
@@ -72,6 +68,15 @@ defmodule Infigonia.CSVParser.Worker do
     case Map.fetch(rates, currency) do
       {:ok, rate} -> rate
       _error -> 0
+    end
+  end
+
+  defp atomize_map_keys(map) when is_map(map) do
+    for {key, val} <- map, into: %{} do
+      cond do
+        is_atom(key) -> {key, val}
+        true -> {String.to_atom(key), val}
+      end
     end
   end
 end
